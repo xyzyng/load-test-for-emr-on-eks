@@ -228,22 +228,22 @@ echo "==============================================="
 echo "Setup Prometheus"
 kubectl create ns prometheus || true
 # SA name and IRSA role were created at EKS cluster creation time
-amp=$(aws amp list-workspaces --query "workspaces[?alias=='$CLUSTER_NAME'].workspaceId" --output text)
-if [ -z "$amp" ]; then
-    echo "Creating a new prometheus workspace..."
-    export WORKSPACE_ID=$(aws amp create-workspace --alias $CLUSTER_NAME --query workspaceId --output text)
-else
-    echo "A prometheus workspace already exists"
-    export WORKSPACE_ID=$amp
-fi
+# amp=$(aws amp list-workspaces --query "workspaces[?alias=='$CLUSTER_NAME'].workspaceId" --output text)
+# if [ -z "$amp" ]; then
+#     echo "Creating a new prometheus workspace..."
+#     export WORKSPACE_ID=$(aws amp create-workspace --alias $CLUSTER_NAME --query workspaceId --output text)
+# else
+#     echo "A prometheus workspace already exists"
+#     export WORKSPACE_ID=$amp
+# fi
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo add kube-state-metrics https://kubernetes.github.io/kube-state-metrics
 helm repo update
 
-sed -i -- 's/{AWS_REGION}/'$AWS_REGION'/g'  ./resources/monitor/prometheus-values.yaml
-sed -i -- 's/{ACCOUNTID}/'$ACCOUNT_ID'/g'  ./resources/monitor/prometheus-values.yaml
-sed -i -- 's/{WORKSPACE_ID}/'$WORKSPACE_ID'/g'  ./resources/monitor/prometheus-values.yaml
-sed -i -- 's/{CLUSTER_NAME}/'$CLUSTER_NAME'/g'  ./resources/monitor/prometheus-values.yaml
+# sed -i -- 's/{AWS_REGION}/'$AWS_REGION'/g'  ./resources/monitor/prometheus-values.yaml
+# sed -i -- 's/{ACCOUNTID}/'$ACCOUNT_ID'/g'  ./resources/monitor/prometheus-values.yaml
+# sed -i -- 's/{WORKSPACE_ID}/'$WORKSPACE_ID'/g'  ./resources/monitor/prometheus-values.yaml
+# sed -i -- 's/{CLUSTER_NAME}/'$CLUSTER_NAME'/g'  ./resources/monitor/prometheus-values.yaml
 helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n prometheus -f  ./resources/monitor/prometheus-values.yaml --debug
 # validate in a web browser - localhost:9090, go to menu of status->targets
 # kubectl --namespace prometheus port-forward service/prometheus-kube-prometheus-prometheus 9090
@@ -251,15 +251,15 @@ helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n 
 # Install metrics server
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
-echo "========================================================="
-echo " 13. Set up Prometheus ServiceMonitor and PodMonitor ......"
-echo "========================================================="
-echo "Create Prometheus service monitor and pod monitor"
-# kubectl apply -f ./resources/monitor/spark-podmonitor.yaml
-kubectl apply -f ./resources/monitor/karpenter-svcmonitor.yaml
-kubectl apply -f ./resources/monitor/aws-cni-podmonitor.yaml
-# kubectl apply -f ./resources/monitor/ebs-csi-controller-svcmonitor.yaml
-kubectl apply -f ./resources/monitor/locust-podmonitor.yaml
+# echo "========================================================="
+# echo " 13. Set up Prometheus ServiceMonitor and PodMonitor ......"
+# echo "========================================================="
+# echo "Create Prometheus service monitor and pod monitor"
+# # kubectl apply -f ./resources/monitor/spark-podmonitor.yaml
+# kubectl apply -f ./resources/monitor/karpenter-svcmonitor.yaml
+# kubectl apply -f ./resources/monitor/aws-cni-podmonitor.yaml
+# # kubectl apply -f ./resources/monitor/ebs-csi-controller-svcmonitor.yaml
+# kubectl apply -f ./resources/monitor/locust-podmonitor.yaml
 
 # echo "================================================================================================================"
 # echo " Ref to https://karpenter.sh/v1.8/reference/cloudformation/"
@@ -433,12 +433,12 @@ if aws ecr describe-repositories --repository-names locust 2>/dev/null; then
 else
     echo "Creating repo locus..."
     aws ecr create-repository --repository-name locust --image-scanning-configuration scanOnPush=true
-    docker run --privileged --rm tonistiigi/binfmt --install all
+    sudo docker run --privileged --rm tonistiigi/binfmt --install all
     # Create multi-arch builder
-    docker buildx create --name arm64-builder --driver docker-container --use
+    sudo docker buildx create --name arm64-builder --driver docker-container --use
 
     # Locust image
-    docker buildx build --platform linux/amd64,linux/arm64 \
+    sudo docker buildx build --platform linux/amd64,linux/arm64 \
     -t $ECR_URL/locust \
     -f ./locust/Dockerfile \
     --push .
@@ -455,9 +455,9 @@ else
     export EMR_VERSIONS=("6.10.0" "7.3.0" "7.9.0")
     for version in "${EMR_VERSIONS[@]}"; do
         echo "Pull the image eks-spark-benchmark:emr${version}..."
-        docker pull $SRC_ECR_URL/myang-poc/eks-spark-benchmark:emr${version}
-        docker tag "$SRC_ECR_URL/myang-poc/eks-spark-benchmark:emr${version}" "$ECR_URL/eks-spark-benchmark:emr${version}"
-        docker push $ECR_URL/eks-spark-benchmark:emr${version}
+        sudo docker pull $SRC_ECR_URL/myang-poc/eks-spark-benchmark:emr${version}
+        sudo docker tag "$SRC_ECR_URL/myang-poc/eks-spark-benchmark:emr${version}" "$ECR_URL/eks-spark-benchmark:emr${version}"
+        sudo docker push $ECR_URL/eks-spark-benchmark:emr${version}
         echo "Pushed $ECR_URL/eks-spark-benchmark:emr${version}"
     done
 fi

@@ -27,5 +27,5 @@ export KARPENTER_CONTROLLER_ROLE="KarpenterControllerRole-${CLUSTER_NAME}"
 export KARPENTER_CONTROLLER_POLICY="KarpenterControllerPolicy-${CLUSTER_NAME}"
 export KARPENTER_NODE_ROLE="KarpenterNodeRole-${CLUSTER_NAME}"
 # Create Amazon Managed Grafana workspace or not
-export USE_AMG="true"
+# export USE_AMG="true"
 # =======================================================================
