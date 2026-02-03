@@ -7,6 +7,9 @@ grafana:
     enabled: true
     size: 10Gi
     storageClassName: gp2
+  service:
+    type: "LoadBalancer"
+    port: 80
 kubelet:
   enabled: false
   # only if EBS controller Metrics is enabled via infra-provision.sh

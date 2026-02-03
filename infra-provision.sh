@@ -248,6 +248,12 @@ helm upgrade --install prometheus prometheus-community/kube-prometheus-stack -n 
 # validate in a web browser - localhost:9090, go to menu of status->targets
 # kubectl --namespace prometheus port-forward service/prometheus-kube-prometheus-prometheus 9090
 
+# Get LB URL with following command 
+#  echo "http://$(kubectl get svc -n prometheus prometheus-grafana -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')"
+#
+# Get grafana admin password with following command 
+# echo $(kubectl get secret prometheus-grafana -o jsonpath="{.data.admin-password}"  -n prometheus | base64 --decode)
+
 # Install metrics server
 kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
