@@ -214,7 +214,7 @@ else
     {
       "Effect": "Allow",
       "Principal": {
-        "Service": "elasticmapreduce.amazonaws.com"
+        "Service": "eks.amazonaws.com"
       },
       "Action": "sts:AssumeRole"
     }

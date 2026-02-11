@@ -3,7 +3,6 @@
 readonly REGION=$1
 readonly EKS_CLUSTER_NAME=$2
 readonly NAMESPACE=$3
-readonly EMR_EKS_EXECUTION_ROLE=$4
 
 # create new namespace
 cat <<EOF | kubectl apply -f -
@@ -26,9 +25,3 @@ eksctl create iamidentitymapping \
     --service-name "emr-containers" \
     --namespace $NAMESPACE \
     --region=$REGION
-
-aws emr-containers update-role-trust-policy \
-       --cluster-name $EKS_CLUSTER_NAME \
-       --namespace $NAMESPACE \
-       --role-name $EMR_EKS_EXECUTION_ROLE \
-       --region=$REGION

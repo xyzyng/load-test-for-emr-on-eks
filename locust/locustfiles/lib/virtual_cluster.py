@@ -6,7 +6,6 @@ from lib.shared import console
 from lib.shared import test_instance
 
 REGION=environ.get("AWS_REGION","us-west-2")
-EMR_EKS_EXECUTION_ROLE=environ.get("EXECUTION_ROLE")
 JOB_RUNNING_STATES = ['PENDING', 'SUBMITTED', 'RUNNING', 'CANCEL_PENDING']
 JOB_STATES = ["PENDING", "SUBMITTED", "RUNNING", "COMPLETED", "FAILED"]
 VC_DEFAULT_STATES = ["RUNNING", "TERMINATED"]
@@ -58,7 +57,7 @@ class VirtualCluster:
                 console.log(f"Script not found: {script_path}")
                 return None
             
-            result = subprocess.run(["sh", script_path, REGION, eks_name, ns_id, EMR_EKS_EXECUTION_ROLE],
+            result = subprocess.run(["sh", script_path, REGION, eks_name, ns_id],
                 capture_output=True, text=True, timeout=120
             )
             
